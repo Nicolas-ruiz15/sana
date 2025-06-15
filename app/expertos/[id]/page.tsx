@@ -1,3 +1,4 @@
+// app/expertos/[id]/page.tsx
 'use client';
 
 import { motion } from 'framer-motion';
@@ -18,160 +19,84 @@ import {
   MessageCircle,
   Video,
   Clock,
-  MapPin
+  MapPin,
+  Languages
 } from 'lucide-react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
-// Datos de los expertos (idealmente esto vendría de una API o base de datos)
-const experts = [
-  {
-    id: 1,
-    name: 'Dr. Susana Gomez',
-    role: 'Life coach, Escritora y Educadora',
-    image: '/images/susana.png',
-    bio: 'Doctora en Psicología Transpersonal con más de 20 años de experiencia ayudando a personas a transformar sus vidas a través del poder de la neuroplasticidad y la liberación emocional. Su enfoque integral combina técnicas científicamente probadas con sabiduría ancestral para crear procesos de sanación profunda y duradera.',
-    detailedBio: 'La Dra. Susana Gomez es una pionera en el campo de la transformación personal y el desarrollo de la conciencia. Con una sólida formación académica y décadas de experiencia práctica, ha desarrollado metodologías únicas que integran la neurociencia moderna con técnicas milenarias de sanación. Su trabajo se centra en empoderar a las personas para que reconozcan su potencial innato y lo manifiesten en todas las áreas de su vida. Ha acompañado a miles de personas en procesos de sanación emocional, superación de traumas y desarrollo de una vida plena y consciente.',
-    specialties: ['Neuroplasticidad', 'Liberación Emocional', 'Terapia Transpersonal', 'Coaching Transformacional', 'Sanación de Traumas', 'Desarrollo de Conciencia'],
-    experience: '20+ años',
-    certifications: [
-      'PhD Psicología Transpersonal - Universidad Internacional',
-      'Certificación Internacional en Neuroplasticidad',
-      'Master en Terapia Gestalt',
-      'Especialización en EMDR',
-      'Certificación en Coaching Ontológico',
-      'Formación en Constelaciones Familiares'
-    ],
-    languages: ['Español', 'Inglés', 'Francés'],
-    rating: 4.9,
-    reviews: 156,
-    featured: true,
-    sessionTypes: ['Sesión Individual 1:1', 'Terapia de Pareja', 'Talleres Grupales', 'Retiros Intensivos'],
-    sessionDuration: '60-90 minutos',
-    availability: 'Lunes a Viernes 9:00 - 18:00',
-    location: 'Consultorio en Madrid + Online',
-    email: 'susana@sanandodesdeelser.com',
-    phone: '+34 600 123 456',
-    testimonials: [
-      {
-        name: 'María Elena R.',
-        text: 'Susana me ayudó a sanar heridas profundas que llevaba años cargando. Su enfoque es profundo pero amoroso.',
-        rating: 5
-      },
-      {
-        name: 'Carlos M.',
-        text: 'Un proceso transformador que cambió completamente mi perspectiva de vida. Altamente recomendada.',
-        rating: 5
-      }
-    ],
-    achievements: [
-      'Autora de 3 libros sobre transformación personal',
-      'Conferencista internacional en más de 50 eventos',
-      'Más de 2000 personas transformadas',
-      'Colaboradora en medios especializados'
-    ]
-  },
-  {
-    id: 2,
-    name: 'Cesar Angel',
-    role: 'Coach ontológico, Mentor, Terapeuta Emocional, Experto en Ansiedad, Coach Organizacional y Laboral',
-    image: '/images/cesar.jpg',
-    bio: 'Coach ontológico certificado con especialización en el manejo de la ansiedad y el desarrollo organizacional. Su enfoque único combina técnicas de coaching con trabajo corporal y danza consciente para crear transformaciones profundas tanto a nivel personal como profesional.',
-    detailedBio: 'Cesar Angel es un facilitador experto en procesos de transformación personal y organizacional. Con formación en coaching ontológico y una amplia experiencia en el mundo empresarial, ha desarrollado metodologías innovadoras que integran el cuerpo, la mente y las emociones en los procesos de cambio. Su especialización en ansiedad le permite ayudar a personas que luchan con este desafío tan común en nuestros tiempos, ofreciendo herramientas prácticas y efectivas para recuperar el bienestar emocional.',
-    specialties: ['Coaching Ontológico', 'Manejo de Ansiedad', 'Danza Consciente', 'Trabajo Corporal', 'Bioenergética', 'Coaching Organizacional'],
-    experience: '15+ años',
-    certifications: [
-      'Master en Coaching Ontológico - ICF Certificado',
-      'Certificación Internacional Yoga Alliance',
-      'Formación en Danza Movimiento Terapia',
-      'Especialización en Bioenergética',
-      'Certificación en Mindfulness',
-      'Coaching Organizacional Avanzado'
-    ],
-    languages: ['Español'],
-    rating: 4.8,
-    reviews: 89,
-    featured: true,
-    sessionTypes: ['Coaching Individual', 'Terapia de Ansiedad', 'Sesiones de Danza Consciente', 'Coaching Empresarial'],
-    sessionDuration: '45-75 minutos',
-    availability: 'Lunes a Sábado 10:00 - 19:00',
-    location: 'Barcelona + Online',
-    email: 'cesar@sanandodesdeelser.com',
-    phone: '+34 600 789 012',
-    testimonials: [
-      {
-        name: 'Ana L.',
-        text: 'Cesar me ayudó a superar mi ansiedad de una forma que nunca imaginé. Su método es revolucionario.',
-        rating: 5
-      },
-      {
-        name: 'Roberto S.',
-        text: 'Como empresario, su coaching me ha dado herramientas invaluables para liderar con conciencia.',
-        rating: 5
-      }
-    ],
-    achievements: [
-      'Más de 1500 sesiones de coaching realizadas',
-      'Facilitador en 30+ empresas multinacionales',
-      'Creador del método Danza del Ser',
-      'Mentor de coaches emergentes'
-    ]
-  },
-  {
-    id: 3,
-    name: 'Andrew Guerra',
-    role: 'Terapeuta gestáltico, coach, mentor, creador y provocador de resultados',
-    image: '/images/andrew.jpeg',
-    bio: 'Terapeuta gestáltico y coach especializado en autoconocimiento y desarrollo personal. Su estilo directo y transformador ha ayudado a cientos de personas a descubrir su verdadero potencial y crear la vida que realmente desean vivir.',
-    detailedBio: 'Andrew Guerra es un provocador de resultados extraordinarios. Con una formación sólida en terapia gestáltica y técnicas de coaching avanzado, se ha especializado en trabajar con personas que buscan cambios profundos y duraderos en sus vidas. Su enfoque directo y sin rodeos, combinado con una profunda compasión, crea un espacio único donde las personas pueden confrontar sus limitaciones y expandir sus posibilidades. Andrew cree firmemente que todos tenemos el poder de crear la vida que deseamos, y su trabajo consiste en ayudar a las personas a despertar ese poder interior.',
-    specialties: ['Terapia Gestáltica', 'Autoconocimiento', 'Desarrollo Personal', 'Coaching de Vida', 'Psicología Positiva', 'Trabajo Corporal'],
-    experience: '12+ años',
-    certifications: [
-      'Certificación en Terapia Gestáltica',
-      'Formación en Trabajo Corporal',
-      'Yoga Terapéutico Certificado',
-      'Certificación en Psicología Positiva',
-      'Coach Profesional Certificado',
-      'Especialización en PNL'
-    ],
-    languages: ['Español', 'Inglés'],
-    rating: 4.9,
-    reviews: 134,
-    featured: true,
-    sessionTypes: ['Terapia Individual', 'Coaching de Vida', 'Sesiones de Trabajo Corporal', 'Intensivos de Fin de Semana'],
-    sessionDuration: '60-120 minutos',
-    availability: 'Martes a Sábado 8:00 - 20:00',
-    location: 'Valencia + Online',
-    email: 'andrew@sanandodesdeelser.com',
-    phone: '+34 600 345 678',
-    testimonials: [
-      {
-        name: 'Laura P.',
-        text: 'Andrew tiene un don para ir directo al corazón de los temas. Cada sesión es una revelación.',
-        rating: 5
-      },
-      {
-        name: 'Miguel A.',
-        text: 'Su estilo directo pero amoroso me ayudó a romper patrones que llevaba años repitiendo.',
-        rating: 5
-      }
-    ],
-    achievements: [
-      'Más de 1000 procesos terapéuticos completados',
-      'Creador de talleres vivenciales únicos',
-      'Facilitador internacional',
-      'Colaborador en programas de desarrollo humano'
-    ]
-  }
-];
+interface Expert {
+  id: number;
+  name: string;
+  role: string;
+  image: string;
+  bio: string;
+  detailedBio: string;
+  specialties: string[];
+  experience: string;
+  certifications: string[];
+  languages: string[];
+  rating: number;
+  reviews: number;
+  featured: boolean;
+  sessionTypes: string[];
+  sessionDuration: string;
+  availability: string;
+  location: string;
+  email: string;
+  phone: string;
+  testimonials: Array<{
+    name: string;
+    text: string;
+    rating: number;
+  }>;
+  achievements: string[];
+  consultationFee: number;
+}
 
 export default function ExpertProfilePage() {
   const params = useParams();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
   const [showContactForm, setShowContactForm] = useState(false);
+  const [expert, setExpert] = useState<Expert | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const expertId = parseInt(params.id as string);
-  const expert = experts.find(e => e.id === expertId);
+
+  useEffect(() => {
+    if (expertId) {
+      loadExpert();
+    }
+  }, [expertId]);
+
+  const loadExpert = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      console.log('Fetching expert with ID:', expertId);
+      const response = await fetch(`/api/expertos/${expertId}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Expert data received:', data);
+
+      if (data.success) {
+        setExpert(data.expert);
+      } else {
+        setError(data.message || 'Expert not found');
+      }
+    } catch (error) {
+      console.error('Error loading expert:', error);
+      setError('Error al cargar el experto: ' + (error instanceof Error ? error.message : 'Error desconocido'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleBackClick = useCallback(() => {
     router.back();
@@ -185,11 +110,23 @@ export default function ExpertProfilePage() {
     setShowContactForm(show);
   }, []);
 
-  if (!expert) {
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando perfil del experto...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !expert) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Experto no encontrado</h1>
+          <p className="text-gray-600 mb-6">{error || 'El experto que buscas no está disponible.'}</p>
           <button 
             onClick={handleBackClick}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
@@ -297,30 +234,42 @@ export default function ExpertProfilePage() {
                   <Award size={16} className="mr-3 text-blue-500" />
                   <span className="text-sm">{expert.experience} de experiencia</span>
                 </div>
-                <div className="flex items-center text-gray-600">
-                  <Clock size={16} className="mr-3 text-blue-500" />
-                  <span className="text-sm">{expert.sessionDuration}</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <MapPin size={16} className="mr-3 text-blue-500" />
-                  <span className="text-sm">{expert.location}</span>
-                </div>
+                
+                {expert.sessionDuration && (
+                  <div className="flex items-center text-gray-600">
+                    <Clock size={16} className="mr-3 text-blue-500" />
+                    <span className="text-sm">{expert.sessionDuration}</span>
+                  </div>
+                )}
+                
+                {expert.location && (
+                  <div className="flex items-center text-gray-600">
+                    <MapPin size={16} className="mr-3 text-blue-500" />
+                    <span className="text-sm">{expert.location}</span>
+                  </div>
+                )}
+                
                 <div className="flex items-center text-gray-600">
                   <Users size={16} className="mr-3 text-blue-500" />
                   <span className="text-sm">{expert.reviews} personas atendidas</span>
                 </div>
 
                 {/* Languages */}
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Idiomas</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {expert.languages.map((lang, idx) => (
-                      <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">
-                        {lang}
-                      </span>
-                    ))}
+                {expert.languages.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
+                      <Languages size={16} className="mr-2 text-blue-500" />
+                      Idiomas
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {expert.languages.map((lang, idx) => (
+                        <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">
+                          {lang}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Contact Buttons */}
                 <div className="space-y-3 pt-4">
@@ -336,14 +285,18 @@ export default function ExpertProfilePage() {
                     Consulta Gratuita
                   </button>
                   <div className="flex gap-2">
-                    <button className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors flex items-center justify-center">
-                      <Phone className="mr-1" size={16} />
-                      Llamar
-                    </button>
-                    <button className="flex-1 bg-blue-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center">
-                      <Mail className="mr-1" size={16} />
-                      Email
-                    </button>
+                    {expert.phone && (
+                      <button className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors flex items-center justify-center">
+                        <Phone className="mr-1" size={16} />
+                        Llamar
+                      </button>
+                    )}
+                    {expert.email && (
+                      <button className="flex-1 bg-blue-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center">
+                        <Mail className="mr-1" size={16} />
+                        Email
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -360,14 +313,14 @@ export default function ExpertProfilePage() {
             {/* Tabs */}
             <div className="bg-white rounded-lg shadow-sm mb-6">
               <div className="border-b border-gray-200">
-                <nav className="flex space-x-8 px-6">
+                <nav className="flex space-x-8 px-6 overflow-x-auto">
                   {tabs.map((tab) => {
                     const Icon = tab.icon;
                     return (
                       <button
                         key={tab.id}
                         onClick={() => handleTabChange(tab.id)}
-                        className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center transition-colors ${
+                        className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center transition-colors whitespace-nowrap ${
                           activeTab === tab.id
                             ? 'border-blue-500 text-blue-600'
                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -393,46 +346,54 @@ export default function ExpertProfilePage() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Acerca de {expert.name}</h2>
                   
                   <div className="prose max-w-none mb-8">
-                    <p className="text-gray-600 leading-relaxed text-lg mb-6">{expert.detailedBio}</p>
+                    <p className="text-gray-600 leading-relaxed text-lg mb-6">
+                      {expert.detailedBio || expert.bio}
+                    </p>
                   </div>
 
                   {/* Specialties */}
-                  <div className="mb-8">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Especialidades</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {expert.specialties.map((specialty, idx) => (
-                        <div key={idx} className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-                          <span className="text-blue-800 font-medium text-sm">{specialty}</span>
-                        </div>
-                      ))}
+                  {expert.specialties.length > 0 && (
+                    <div className="mb-8">
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">Especialidades</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {expert.specialties.map((specialty, idx) => (
+                          <div key={idx} className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                            <span className="text-blue-800 font-medium text-sm">{specialty}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Session Types */}
-                  <div className="mb-8">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Tipos de Sesión</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {expert.sessionTypes.map((type, idx) => (
-                        <div key={idx} className="flex items-center p-4 bg-gray-50 rounded-lg">
-                          <CheckCircle className="text-green-500 mr-3" size={20} />
-                          <span className="text-gray-700">{type}</span>
-                        </div>
-                      ))}
+                  {expert.sessionTypes.length > 0 && (
+                    <div className="mb-8">
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">Tipos de Sesión</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {expert.sessionTypes.map((type, idx) => (
+                          <div key={idx} className="flex items-center p-4 bg-gray-50 rounded-lg">
+                            <CheckCircle className="text-green-500 mr-3" size={20} />
+                            <span className="text-gray-700">{type}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Achievements */}
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Logros Destacados</h3>
-                    <div className="space-y-3">
-                      {expert.achievements.map((achievement, idx) => (
-                        <div key={idx} className="flex items-start">
-                          <Award className="text-yellow-500 mr-3 mt-1" size={16} />
-                          <span className="text-gray-700">{achievement}</span>
-                        </div>
-                      ))}
+                  {expert.achievements.length > 0 && (
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">Logros Destacados</h3>
+                      <div className="space-y-3">
+                        {expert.achievements.map((achievement, idx) => (
+                          <div key={idx} className="flex items-start">
+                            <Award className="text-yellow-500 mr-3 mt-1" size={16} />
+                            <span className="text-gray-700">{achievement}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </motion.div>
               )}
 
@@ -444,39 +405,47 @@ export default function ExpertProfilePage() {
                 >
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Formación y Certificaciones</h2>
                   
-                  <div className="space-y-6">
-                    {expert.certifications.map((cert, idx) => (
-                      <div key={idx} className="border-l-4 border-blue-500 pl-6 py-2">
-                        <div className="flex items-start">
-                          <CheckCircle className="text-blue-500 mr-3 mt-1" size={16} />
-                          <div>
-                            <h4 className="font-semibold text-gray-900">{cert}</h4>
+                  {expert.certifications.length > 0 ? (
+                    <div className="space-y-6">
+                      {expert.certifications.map((cert, idx) => (
+                        <div key={idx} className="border-l-4 border-blue-500 pl-6 py-2">
+                          <div className="flex items-start">
+                            <CheckCircle className="text-blue-500 mr-3 mt-1" size={16} />
+                            <div>
+                              <h4 className="font-semibold text-gray-900">{cert}</h4>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-600 text-center py-8">No hay certificaciones registradas.</p>
+                  )}
 
                   {/* Availability */}
-                  <div className="mt-12 p-6 bg-blue-50 rounded-lg">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Disponibilidad</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="flex items-center">
-                        <Clock className="text-blue-500 mr-3" size={20} />
-                        <div>
-                          <div className="font-semibold text-gray-900">Horarios</div>
-                          <div className="text-gray-600">{expert.availability}</div>
+                  {expert.availability && (
+                    <div className="mt-12 p-6 bg-blue-50 rounded-lg">
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">Disponibilidad</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex items-center">
+                          <Clock className="text-blue-500 mr-3" size={20} />
+                          <div>
+                            <div className="font-semibold text-gray-900">Horarios</div>
+                            <div className="text-gray-600">{expert.availability}</div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex items-center">
-                        <MapPin className="text-blue-500 mr-3" size={20} />
-                        <div>
-                          <div className="font-semibold text-gray-900">Modalidad</div>
-                          <div className="text-gray-600">{expert.location}</div>
-                        </div>
+                        {expert.location && (
+                          <div className="flex items-center">
+                            <MapPin className="text-blue-500 mr-3" size={20} />
+                            <div>
+                              <div className="font-semibold text-gray-900">Modalidad</div>
+                              <div className="text-gray-600">{expert.location}</div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
+                  )}
                 </motion.div>
               )}
 
@@ -488,21 +457,25 @@ export default function ExpertProfilePage() {
                 >
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Lo que dicen nuestros clientes</h2>
                   
-                  <div className="space-y-6">
-                    {expert.testimonials.map((testimonial, idx) => (
-                      <div key={idx} className="bg-gray-50 rounded-lg p-6">
-                        <div className="flex items-center mb-4">
-                          <div className="flex">
-                            {[...Array(testimonial.rating)].map((_, i) => (
-                              <Star key={i} size={16} className="text-yellow-400 fill-current" />
-                            ))}
+                  {expert.testimonials.length > 0 ? (
+                    <div className="space-y-6">
+                      {expert.testimonials.map((testimonial, idx) => (
+                        <div key={idx} className="bg-gray-50 rounded-lg p-6">
+                          <div className="flex items-center mb-4">
+                            <div className="flex">
+                              {[...Array(testimonial.rating)].map((_, i) => (
+                                <Star key={i} size={16} className="text-yellow-400 fill-current" />
+                              ))}
+                            </div>
+                            <span className="ml-2 font-semibold text-gray-900">{testimonial.name}</span>
                           </div>
-                          <span className="ml-2 font-semibold text-gray-900">{testimonial.name}</span>
+                          <p className="text-gray-700 italic">&quot;{testimonial.text}&quot;</p>
                         </div>
-                        <p className="text-gray-700 italic">&quot;{testimonial.text}&quot;</p>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-600 text-center py-8">No hay testimonios disponibles aún.</p>
+                  )}
 
                   {/* Stats */}
                   <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -515,8 +488,10 @@ export default function ExpertProfilePage() {
                       <div className="text-gray-600">Reseñas totales</div>
                     </div>
                     <div className="text-center p-6 bg-blue-50 rounded-lg">
-                      <div className="text-3xl font-bold text-blue-600 mb-2">98%</div>
-                      <div className="text-gray-600">Recomendarían</div>
+                      <div className="text-3xl font-bold text-blue-600 mb-2">
+                        {expert.reviews > 0 ? Math.round((expert.rating / 5) * 100) : 0}%
+                      </div>
+                      <div className="text-gray-600">Satisfacción</div>
                     </div>
                   </div>
                 </motion.div>
@@ -532,35 +507,44 @@ export default function ExpertProfilePage() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-6">
-                      <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-                        <Mail className="text-blue-500 mr-4" size={24} />
-                        <div>
-                          <div className="font-semibold text-gray-900">Email</div>
-                          <div className="text-gray-600">{expert.email}</div>
+                      {expert.email && (
+                        <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+                          <Mail className="text-blue-500 mr-4" size={24} />
+                          <div>
+                            <div className="font-semibold text-gray-900">Email</div>
+                            <div className="text-gray-600">{expert.email}</div>
+                          </div>
                         </div>
-                      </div>
+                      )}
                       
-                      <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-                        <Phone className="text-blue-500 mr-4" size={24} />
-                        <div>
-                          <div className="font-semibold text-gray-900">Teléfono</div>
-                          <div className="text-gray-600">{expert.phone}</div>
+                      {expert.phone && (
+                        <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+                          <Phone className="text-blue-500 mr-4" size={24} />
+                          <div>
+                            <div className="font-semibold text-gray-900">Teléfono</div>
+                            <div className="text-gray-600">{expert.phone}</div>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
-                      <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-                        <MapPin className="text-blue-500 mr-4" size={24} />
-                        <div>
-                          <div className="font-semibold text-gray-900">Ubicación</div>
-                          <div className="text-gray-600">{expert.location}</div>
+                      {expert.location && (
+                        <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+                          <MapPin className="text-blue-500 mr-4" size={24} />
+                          <div>
+                            <div className="font-semibold text-gray-900">Ubicación</div>
+                            <div className="text-gray-600">{expert.location}</div>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     
                     <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg p-6 text-white">
                       <h3 className="text-xl font-bold mb-4">¿Listo para comenzar?</h3>
                       <p className="mb-6">Agenda tu consulta gratuita de 20 minutos para conocer cómo podemos ayudarte.</p>
-                      <button className="w-full bg-white text-blue-600 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                      <button 
+                        onClick={() => handleContactFormToggle(true)}
+                        className="w-full bg-white text-blue-600 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                      >
                         Agendar Consulta Gratuita
                       </button>
                     </div>
@@ -585,15 +569,35 @@ export default function ExpertProfilePage() {
             <form className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                <input type="text" className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                <input 
+                  type="text" 
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                  placeholder="Tu nombre completo"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                <input 
+                  type="email" 
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                  placeholder="tu@email.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono (opcional)</label>
+                <input 
+                  type="tel" 
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                  placeholder="+34 600 000 000"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Mensaje</label>
-                <textarea rows={4} className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                <textarea 
+                  rows={4} 
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Cuéntanos en qué te gustaría que te ayudáramos..."
+                ></textarea>
               </div>
               <div className="flex gap-3">
                 <button
